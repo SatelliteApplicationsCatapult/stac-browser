@@ -1,0 +1,5 @@
+# ignore env folder
+env/
+public/
+node_modules/
+.vscode/
