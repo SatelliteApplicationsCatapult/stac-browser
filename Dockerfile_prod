@@ -1,0 +1,28 @@
+FROM node:16 as build-step
+WORKDIR /usr/src/app
+COPY package.json .
+COPY package-lock.json .
+COPY .npmignore .
+RUN npm install
+COPY . .
+RUN npm run build -- --catalogUrl="https://ctplt-pda-rg-prod-stac-api-browser.azurewebsites.net/stac/"
+RUN pwd
+
+FROM stacpdadev.azurecr.io/stac-api-server:latest
+RUN apt-get update && apt-get install -y nginx
+COPY nginx.conf /etc/nginx/sites-available/default
+COPY --from=build-step /usr/src/app/dist /var/www/html
+EXPOSE 80
+ENV APP_HOST="0.0.0.0"
+ENV APP_PORT="8082"
+ENV ENVIROMENT = "prod"
+ENV WEB_CONCURRENCY=10
+ENV VSI_CACHE=TRUE
+ENV GDAL_HTTP_MERGE_CONSECUTIVE_RANGES=YES
+ENV GDAL_DISABLE_READDIR_ON_OPEN=EMPTY_DIR
+ENV DB_MIN_CONN_SIZE=10
+ENV DB_MAX_CONN_SIZE=10
+ENV BASE_URL="/stac"
+
+
+CMD nginx ; python -m stac_fastapi.pgstac.app
