@@ -1,25 +1,28 @@
-FROM node:16
+FROM node:16 as build-step
 WORKDIR /usr/src/app
-RUN apt-get update -y
-RUN apt-get upgrade -y
-RUN apt-get -y update && apt-get -y install nginx
-# install python3.8 and pip
-# replace contents of /etc/nginx/sites-available/default with contents from nginx.conf
-COPY nginx.conf /etc/nginx/sites-available/default
-# COPY requirements.txt .
-# RUN pip3 install -r requirements.txt
 COPY package.json .
 COPY package-lock.json .
 COPY .npmignore .
 RUN npm install
 COPY . .
-RUN npm run build -- --CATALOG_URL="https://planetarycomputer.microsoft.com/api/stac/v1"
-WORKDIR /usr/src/app/dist
-RUN cp -rf . /var/www/html
-# install requirements.txt
-WORKDIR /usr/src/app
+RUN npm run build -- --catalogUrl="https://ctplt-pda-rg-dev-stac-api-browser.azurewebsites.net/stac/"
+RUN pwd
 
-EXPOSE 80/tcp
-# start both nginx and gunicon hosting proxy:app
-CMD nginx -g daemon off;
+FROM stacpdadev.azurecr.io/stac-api-server:latest
+RUN apt-get update && apt-get install -y nginx
+COPY nginx.conf /etc/nginx/sites-available/default
+COPY --from=build-step /usr/src/app/dist /var/www/html
+EXPOSE 80
+ENV APP_HOST="0.0.0.0"
+ENV APP_PORT="8082"
+ENV ENVIROMENT = "prod"
+ENV WEB_CONCURRENCY=10
+ENV VSI_CACHE=TRUE
+ENV GDAL_HTTP_MERGE_CONSECUTIVE_RANGES=YES
+ENV GDAL_DISABLE_READDIR_ON_OPEN=EMPTY_DIR
+ENV DB_MIN_CONN_SIZE=10
+ENV DB_MAX_CONN_SIZE=10
+ENV BASE_URL="/stac"
 
+
+CMD nginx ; python -m stac_fastapi.pgstac.app
