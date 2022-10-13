@@ -11,8 +11,8 @@ env/
 .env.*.local
 
 # lock files
-/yarn.lock
-/package-lock.json
+#/yarn.lock
+#/package-lock.json
 
 # Log files
 npm-debug.log*
