@@ -17,6 +17,9 @@ from Dockerfile_dev and Dockerfile_prod.
 |POSTGRES_HOST_READER| Hostname of the database for read connections|
 |POSTGRES_HOST_WRITER| Hostname of the database for write connections|
 |POSTGRES_PORT| Postgress port|
+|AZURE_SIGN_BLOBS|Append SAS Read tokens to blob urls specified with |
+|AZURE_STORAGE_CONNECTION_STRING| Azure storage string used to sign private blobs|
+|AZURE_STORAGE_BLOB_NAME_FOR_STAC_ITEMS|Container name for storing the blobs|
 
 ## Notes
 - Build process uses docker container created by https://github.com/SpatialDays/stac-api-server
