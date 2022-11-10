@@ -5,7 +5,7 @@ COPY package-lock.json .
 COPY .npmignore .
 RUN npm install
 COPY . .
-RUN npm run build -- --catalogUrl="https://ctplt-pda-rg-dev-stac-api-browser.azurewebsites.net/stac/"
+RUN npm run build -- --catalogUrl="https://ctplt-pda-rg-stage-stac-api-browser.azurewebsites.net/stac/"
 RUN pwd
 
 FROM stacpdadev.azurecr.io/stac-api-server:latest
@@ -16,12 +16,6 @@ EXPOSE 80
 ENV APP_HOST="0.0.0.0"
 ENV APP_PORT="8082"
 ENV ENVIROMENT = "prod"
-# ENV POSTGRES_USER=username
-# ENV POSTGRES_PASS=password
-# ENV POSTGRES_DBNAME=postgis
-# ENV POSTGRES_HOST_READER='172.17.0.1'
-# ENV POSTGRES_HOST_WRITER='172.17.0.1'
-# ENV POSTGRES_PORT=5439
 ENV WEB_CONCURRENCY=1
 ENV VSI_CACHE=TRUE
 ENV GDAL_HTTP_MERGE_CONSECUTIVE_RANGES=YES
